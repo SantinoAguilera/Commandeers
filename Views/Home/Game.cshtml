@@ -1,0 +1,43 @@
+<script>
+    const piece = document.getElementById("piece");
+    const container = document.getElementById("game-container");
+    let isPieceSelected = false;
+
+    piece.addEventListener("click", () => {
+        isPieceSelected = true;
+        piece.style.border = "2px solid red";
+    })
+
+    container.addEventListener("click", (e) => {
+        if (isPieceSelected)
+        {
+            const containerRect = container.getBoundingClientRect();
+            const newX = e.clientX - containerRect.left - piece.offsetWidth / 2;
+            const newY = e.clientY - containerRect.top - piece.offsetHeight / 2;
+
+            piece.style.left = `${newX}px`;
+            piece.style.top = `${newY}px`;
+
+            isPieceSelected = false;
+            piece.style.border = "none";
+
+            sendCoordinatesToServer(newX, newY)
+        }
+    });
+
+    function sendCoordinatesToServer(x, y)
+    {
+        fetch('/HomeController/SaveCoordinates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x: x, y: y })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("CoordinatesOK");
+            } else {
+                console.error("CoordinatesERROR");
+            }
+        });
+    }
+</script>
